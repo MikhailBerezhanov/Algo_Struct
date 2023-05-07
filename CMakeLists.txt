@@ -1,0 +1,18 @@
+cmake_minimum_required(VERSION 3.14)
+
+project(algo_struct)
+
+# GoogleTest requires at least C++14
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/b796f7d44681514f58a683a3a71ff17c94edb0c1.zip 
+)
+
+FetchContent_MakeAvailable(googletest)
+
+# Build submodules 
+add_subdirectory(LinkedList)
