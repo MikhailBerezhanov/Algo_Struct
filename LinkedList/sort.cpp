@@ -345,21 +345,3 @@ int main()
 	
 	return 0;
 }
-
-// void func1(std::initializer_list<int> &ilist)
-// {
-// 	if(ilist.size() < 4){
-// 		throw ...
-// 	}
-
-// 	std::befin(ilist) + 0; // 1st arg
-// 	ilist.begin + 1; // 2nd arg
-// 	ilist.begin + 2; // 3th arg
-// }
-
-// void func2(std::initializer_list<int> &ilist)
-// {
-// 	if(ilist.empty()){
-// 		return;
-// 	}
-// }

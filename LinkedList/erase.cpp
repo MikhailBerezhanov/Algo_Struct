@@ -8,29 +8,6 @@ using namespace std;
 // элементе которого записано целое положительное число. 
 // Нужно удалить все узлы с нечётными значениями.
 
-
-// struct ListNode
-// {
-// 	ListNode(int value_ = 0, ListNode *next_ = nullptr): value(value_), next(next_) {}
-// 	int value = 0;
-// 	ListNode *next = nullptr;
-
-// 	static void print(const ListNode *head){
-// 		const ListNode *curr_node = head;
-
-// 		if( !curr_node ){
-// 			cout << "null";
-// 		}
-
-// 		while(curr_node){
-// 			cout << curr_node->value << " -> ";
-// 			curr_node = curr_node->next;
-// 		}
-// 		cout << endl;
-// 	}
-// };
-
-
 // 1 -> 4 -> 5 -> 6 -> 13 -> 12 -> 11 -> null
 //
 // 4 -> 6 -> 12 -> null
