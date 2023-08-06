@@ -96,12 +96,12 @@ namespace AlgoStruct
         ~ForwardList();
 
         // Iterators getters
-        Iterator begin() const;
-        Iterator end() const;
+        Iterator begin() const noexcept;
+        Iterator end() const noexcept;
 
         // Size checkers 
-        bool empty() const;
-        size_t size() const;
+        bool empty() const noexcept;
+        size_t size() const noexcept;
 
         // Inserts an element to the list
         void push_front(const T& value);
@@ -130,6 +130,9 @@ namespace AlgoStruct
         // Clears the contents of the list
         void clear();
 
+        // Merge sort of list elements
+        void sort();
+
     private:
         Node* m_head = nullptr;
         Node* m_tail = nullptr;
@@ -152,25 +155,25 @@ namespace AlgoStruct
     }
 
     template <typename T>
-    auto ForwardList<T>::begin() const -> Iterator
+    auto ForwardList<T>::begin() const noexcept -> Iterator
     {
         return Iterator(m_head);
     }
 
     template <typename T>
-    auto ForwardList<T>::end() const -> Iterator
+    auto ForwardList<T>::end() const noexcept -> Iterator
     {
         return Iterator(m_tail->next);
     }
 
     template <typename T>
-    bool ForwardList<T>::empty() const
+    bool ForwardList<T>::empty() const noexcept
     {
         return m_head == nullptr;
     }
 
     template <typename T>
-    size_t ForwardList<T>::size() const
+    size_t ForwardList<T>::size() const noexcept
     {
         return m_size;
     }
@@ -332,7 +335,7 @@ namespace AlgoStruct
     {
         if (!m_tail)
         {
-            throw std::runtime_error("front() on empty list");
+            throw std::runtime_error("back() on empty list");
         }
 
         return m_tail->value;
@@ -344,10 +347,10 @@ namespace AlgoStruct
         return const_cast<ForwardList*>(this)->back();
     }
 
-
-// Helper functions
-
-
-    // bool has_cycle(const ForwardList::Node* head);
+    template <typename T>
+    void ForwardList<T>::sort()
+    {
+        // TODO
+    }
 
 } // namespace AlgoStruct
