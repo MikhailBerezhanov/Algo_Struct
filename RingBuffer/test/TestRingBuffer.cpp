@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <string>
 
-using namespace R2C;
+using namespace AlgoStruct;
 using namespace ::testing;
 
 

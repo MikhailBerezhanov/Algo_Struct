@@ -96,7 +96,7 @@ namespace detail
     };
 } // namespace detail
 
-namespace R2C
+namespace AlgoStruct
 {
     template<typename T>
     class RingBuffer
@@ -448,4 +448,4 @@ namespace R2C
             --ptr;
         }
     }
-} // namespace R2C
+} // namespace AlgoStruct
