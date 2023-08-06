@@ -6,6 +6,8 @@ project(algo_struct)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
+cmake_policy(SET CMP0135 NEW)
+
 include(FetchContent)
 FetchContent_Declare(
   googletest
@@ -16,3 +18,4 @@ FetchContent_MakeAvailable(googletest)
 
 # Build submodules 
 add_subdirectory(LinkedList)
+add_subdirectory(RingBuffer)
