@@ -133,7 +133,7 @@ TEST(TestForwardList, ShouldInsertAfterHead)
 
     auto it = list.begin();
     list.insert_after(it, 10);
-    ASSERT_THAT(traverse(list), ElementsAreArray({ 0, 10, 1, 2, 3, 4}));
+    ASSERT_THAT(traverse(list), ElementsAreArray({0, 10, 1, 2, 3, 4}));
 }
 
 TEST(TestForwardList, ShouldInsertAfterTail)
@@ -144,10 +144,10 @@ TEST(TestForwardList, ShouldInsertAfterTail)
     it += 4;
     list.insert_after(it, 10);
 
-    ASSERT_THAT(traverse(list), ElementsAreArray({ 0, 1, 2, 3, 4, 10}));
+    ASSERT_THAT(traverse(list), ElementsAreArray({0, 1, 2, 3, 4, 10}));
 
     list.push_back(11);
-    ASSERT_THAT(traverse(list), ElementsAreArray({ 0, 1, 2, 3, 4, 10, 11}));
+    ASSERT_THAT(traverse(list), ElementsAreArray({0, 1, 2, 3, 4, 10, 11}));
 }
 
 TEST(TestForwardList, ShouldIgnoreInsertingAfterEnd)
@@ -170,7 +170,7 @@ TEST(TestForwardList, ShouldEraseAfterBegin)
     auto it2 = list.erase_after(it);
 
     ASSERT_EQ(*it2, 0);
-    ASSERT_THAT(traverse(list), ElementsAreArray({ -1, 0, 3, 3}));
+    ASSERT_THAT(traverse(list), ElementsAreArray({-1, 0, 3, 3}));
 }
 
 TEST(TestForwardList, ShouldEraseTail)
@@ -182,8 +182,36 @@ TEST(TestForwardList, ShouldEraseTail)
     auto it2 = list.erase_after(it);
 
     ASSERT_EQ(it2, list.end());
-    ASSERT_THAT(traverse(list), ElementsAreArray({ 0, 0, 0}));
+    ASSERT_THAT(traverse(list), ElementsAreArray({0, 0, 0}));
 
     list.push_back(13);
     ASSERT_EQ(list.back(), 13);
+}
+
+TEST(TestForwardList, ShouldSortListOfOneElement)
+{
+    ForwardList list{1};
+    list.sort();
+    ASSERT_THAT(traverse(list), ElementsAreArray({1}));
+}
+
+TEST(TestForwardList, ShouldSortListOfTwoElements)
+{
+    ForwardList list{2, 0};
+    list.sort();
+    ASSERT_THAT(traverse(list), ElementsAreArray({0, 2}));
+}
+
+TEST(TestForwardList, ShouldSortChars)
+{
+    ForwardList list{'d', 'b', 'c', 'a', 'e'};
+    list.sort();
+    ASSERT_THAT(traverse(list), ElementsAreArray({'a', 'b', 'c', 'd', 'e'}));
+}
+
+TEST(TestForwardList, ShouldSortWithDuplicates)
+{
+    ForwardList list{10, 2, 3, 4, 2, -1, 3, 21, 5, 9};
+    list.sort();
+    ASSERT_THAT(traverse(list), ElementsAreArray({-1, 2, 2, 3, 3, 4, 5, 9, 10, 21}));
 }

@@ -44,7 +44,7 @@ namespace AlgoStruct
                 return m_current;
             }
 
-            int& operator* ()
+            value_type& operator* ()
             {
                 return m_current->value;
             }
@@ -62,12 +62,12 @@ namespace AlgoStruct
                 return tmp;
             }
 
-            friend bool operator== (const Iterator& lhs, const Iterator& rhs)
+            friend bool operator== (const Iterator& lhs, const Iterator& rhs) noexcept
             {
                 return lhs.m_current == rhs.m_current;
             }
 
-            friend bool operator!= (const Iterator& lhs, const Iterator& rhs)
+            friend bool operator!= (const Iterator& lhs, const Iterator& rhs) noexcept
             {
                 return !(lhs == rhs);
             }
@@ -132,6 +132,11 @@ namespace AlgoStruct
 
         // Merge sort of list elements
         void sort();
+
+    private:
+        Node* split(Node* head);
+        std::pair<Node*, Node*> merge(Node* left_head, Node* right_head);
+        std::pair<Node*, Node*> merge_sort(Node* head);
 
     private:
         Node* m_head = nullptr;
@@ -348,9 +353,111 @@ namespace AlgoStruct
     }
 
     template <typename T>
+    auto ForwardList<T>::split(Node* head) -> Node*
+    {
+        Node* slow = head;
+        Node* fast = head;
+        Node* mid = slow;
+
+        while (fast && fast->next)
+        {
+            mid = slow;
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+
+        return mid;
+    }
+
+    template <typename T>
+    auto ForwardList<T>::merge(Node* left_head, Node* right_head) -> std::pair<Node*, Node*>
+    {
+        Node* new_head = nullptr;
+        Node* new_tail = nullptr;
+
+        const auto append_node = [&new_head, &new_tail](Node* node)
+        {
+            if (!new_head)
+            {
+                new_head = node;
+                new_tail = new_head;
+            }
+            else
+            {
+                new_tail->next = node;
+                new_tail = new_tail->next;
+            }
+        };
+
+        while (left_head && right_head)
+        {
+            if (left_head->value <= right_head->value)
+            {
+                append_node(left_head);
+                left_head = left_head->next;
+            }
+            else
+            {
+                append_node(right_head);
+                right_head = right_head->next;
+            }
+        }
+
+        while (left_head)
+        {
+            append_node(left_head);
+            left_head = left_head->next;
+        }
+
+        while (right_head)
+        {
+            append_node(right_head);
+            right_head = right_head->next;
+        }
+
+        return {new_head, new_tail};
+    }
+
+    template <typename T>
+    auto ForwardList<T>::merge_sort(Node* head) -> std::pair<Node*, Node*>
+    {
+        // 3 -> 2 -> 1 -> 5 -> 4 ->
+        //          split
+        // 3 -> 2 ->        1 -> 5 -> 4 ->
+        //   split              split
+        // 3 ->     2 ->    1 ->   5 -> 4 ->
+        //     merge                split
+        // 2 -> 3 ->        1 ->    5 ->   4 -> 
+        //                             merge
+        // 2 -> 3 ->        1 ->    4 -> 5 ->
+        //                     merge
+        // 2 -> 3 ->        1 -> 4 -> 5 ->
+        //           merge 
+        // 1 -> 2 -> 3 -> 4 -> 5 ->
+
+        if (!head || !head->next)
+        {
+            return {head, head};
+        }
+
+        Node* mid = split(head);
+        Node* left_head = head;
+        Node* right_head = mid->next;
+        mid->next = nullptr;
+
+        const auto left_sorted = merge_sort(left_head);
+        const auto right_sorted = merge_sort(right_head);
+
+        return merge(left_sorted.first, right_sorted.first);
+    }
+
+    template <typename T>
     void ForwardList<T>::sort()
     {
-        // TODO
+        const auto head_tail = merge_sort(m_head);
+
+        m_head = head_tail.first;
+        m_tail = head_tail.second;
     }
 
 } // namespace AlgoStruct
