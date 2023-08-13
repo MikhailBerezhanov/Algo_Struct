@@ -17,5 +17,6 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 # Build submodules 
+add_subdirectory(Sorts)
 add_subdirectory(LinkedList)
 add_subdirectory(RingBuffer)
