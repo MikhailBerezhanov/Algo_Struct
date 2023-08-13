@@ -1,4 +1,5 @@
 #include "BubbleSort.hpp"
+#include "InsertSort.hpp"
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
