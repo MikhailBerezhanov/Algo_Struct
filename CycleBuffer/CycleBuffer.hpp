@@ -11,11 +11,35 @@ template <typename T>
 class CycleBuffer
 {
 public:
-    class Iterator 
+    class Iterator : public std::iterator<std::forward_iterator_tag, T>
     {
-        using interator_category = std::forward_iterator_tag;
+    public:
+        Iterator(CycleBuffer<T>* cycleBuffer, int bufIndex)
+            : m_cycleBuffer(cycleBuffer)
+            , m_bufIndex(bufIndex) 
+        {}
 
-        // TODO:
+        Iterator& operator++ ()     // prefix increment: ++it;
+        {
+            m_cycleBuffer->increment_index(m_bufIndex);
+            return *this;
+        }
+
+        Iterator operator++ (int)   // postfix increment: it++;
+        {
+            Iterator tmp = *this;
+            ++(*this);
+            return tmp;
+        }
+
+        T* operator-> () { return &(m_cycleBuffer->m_buf[m_bufIndex]); }
+        T& operator* () { return m_cycleBuffer->m_buf[m_bufIndex]; }
+
+        friend bool operator== (const Iterator& lhs, const Iterator& rhs) { return lhs.m_bufIndex == rhs.m_bufIndex; }
+        friend bool operator!= (const Iterator& lhs, const Iterator& rhs) { return !(lhs == rhs); }
+    private:
+        CycleBuffer<T>* const m_cycleBuffer = nullptr;
+        int m_bufIndex = -1;
     };
 
     explicit CycleBuffer(int size)
@@ -37,39 +61,30 @@ public:
     size_t size() const { return m_size; }
     bool empty() const { return m_size == 0; }
 
-    // TODO: temp solution instead of begin() + end()
-    std::vector<T> GetContent() const
-    {
-        std::vector<T> res;
-        res.reserve(m_buf.size());
-        int idx = m_head;
-        for (int sz = 0; sz < m_size; ++sz) {
-            res.push_back(m_buf[idx]);
-            increment_marker(idx);
-        }
-
-        return res;
-    }
+    Iterator begin() noexcept { return Iterator(this, m_headIndex); }
+    Iterator end() noexcept { return Iterator(this, m_headIndex + m_size % m_buf.size()); }
 
 private:
-    void increment_marker(int& m) const { m = (m + 1) % m_buf.size(); }
-    void decrement_marker(int& m) const { m = (m - 1 + m_buf.size()) % m_buf.size(); }
+    friend Iterator;
+
+    void increment_index(int& i) const { i = (i + 1) % m_buf.size(); }
+    void decrement_index(int& i) const { i = (i - 1 + m_buf.size()) % m_buf.size(); }
 
 private:
     size_t m_size = 0;
     std::vector<T> m_buf;
-    int m_tail = -1;
-    int m_head = 0;
+    int m_tailIndex = -1;
+    int m_headIndex = 0;
 };
 
 template <typename T>
 void CycleBuffer<T>::push_back(T val)
 {
-    increment_marker(m_tail);
-    m_buf[m_tail] = val;
+    increment_index(m_tailIndex);
+    m_buf[m_tailIndex] = val;
 
     if (m_size == m_buf.size()) {
-        increment_marker(m_head);
+        increment_index(m_headIndex);
     }
     else {
         ++m_size;
@@ -79,11 +94,11 @@ void CycleBuffer<T>::push_back(T val)
 template <typename T>
 void CycleBuffer<T>::push_front(T val)
 {
-    decrement_marker(m_head);
-    m_buf[m_head] = val;
+    decrement_index(m_headIndex);
+    m_buf[m_headIndex] = val;
 
     if (m_size == m_buf.size()) {
-        decrement_marker(m_tail);
+        decrement_index(m_tailIndex);
     }
     else {
         ++m_size;
@@ -97,7 +112,7 @@ T CycleBuffer<T>::back() const
         throw std::runtime_error("back() on empty buffer");
     }
 
-    return m_buf[m_tail];
+    return m_buf[m_tailIndex];
 }
 
 template <typename T>
@@ -107,7 +122,7 @@ T CycleBuffer<T>::front() const
         throw std::runtime_error("front() on empty buffer");
     }
 
-    return m_buf[m_head];
+    return m_buf[m_headIndex];
 }
 
 

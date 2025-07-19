@@ -6,6 +6,17 @@
 using namespace ::testing;
 using namespace AlgoStruct;
 
+static std::vector<int> CycleBufferContent(CycleBuffer<int>& sut)
+{
+    std::vector<int> res;
+    res.reserve(sut.size());
+
+    for (auto it = sut.begin(); it != sut.end(); ++it) {
+        res.push_back(*it);
+    }
+
+    return res;
+}
 
 TEST(TestCycleBuffer, ShouldPushBack)
 {
@@ -20,14 +31,14 @@ TEST(TestCycleBuffer, ShouldPushBack)
     ASSERT_EQ(3, sut.size());
 
     const std::vector expectedVec1{1, 2, 3};
-    ASSERT_EQ(expectedVec1, sut.GetContent());
+    ASSERT_EQ(expectedVec1, CycleBufferContent(sut));
 
     sut.push_back(10);
     ASSERT_EQ(10, sut.back());
     ASSERT_EQ(3, sut.size());
 
     const std::vector expectedVec2{2, 3, 10};
-    ASSERT_EQ(expectedVec2, sut.GetContent());
+    ASSERT_EQ(expectedVec2, CycleBufferContent(sut));
 }
 
 TEST(TestCycleBuffer, ShouldPushFront)
