@@ -14,14 +14,14 @@ public:
     class Iterator : public std::iterator<std::forward_iterator_tag, T>
     {
     public:
-        Iterator(CycleBuffer<T>* cycleBuffer, int bufIndex)
-            : m_cycleBuffer(cycleBuffer)
-            , m_bufIndex(bufIndex) 
+        Iterator(CycleBuffer<T>* parentPtr, T* elemPtr)
+            : m_parentPtr(parentPtr)
+            , m_elemPtr(elemPtr) 
         {}
 
         Iterator& operator++ ()     // prefix increment: ++it;
         {
-            m_cycleBuffer->increment_index(m_bufIndex);
+            increment(m_elemPtr);
             return *this;
         }
 
@@ -32,14 +32,40 @@ public:
             return tmp;
         }
 
-        T* operator-> () { return &(m_cycleBuffer->m_buf[m_bufIndex]); }
-        T& operator* () { return m_cycleBuffer->m_buf[m_bufIndex]; }
+        T* operator-> () { return m_elemPtr; }
+        T& operator* () { return *m_elemPtr; }
 
-        friend bool operator== (const Iterator& lhs, const Iterator& rhs) { return lhs.m_bufIndex == rhs.m_bufIndex; }
+        operator bool() const { return m_elemPtr != nullptr; }
+        friend bool operator== (const Iterator& lhs, const Iterator& rhs) { return lhs.m_parentPtr == rhs.m_parentPtr && lhs.m_elemPtr == rhs.m_elemPtr; }
         friend bool operator!= (const Iterator& lhs, const Iterator& rhs) { return !(lhs == rhs); }
+
     private:
-        CycleBuffer<T>* const m_cycleBuffer = nullptr;
-        int m_bufIndex = -1;
+        void increment(T*& elemPtr)
+        {
+            if (!elemPtr) {
+                return;
+            }
+
+            const int lastIdx = (m_parentPtr->m_headIndex + m_parentPtr->m_size - 1) % m_parentPtr->m_buf.size();
+            const auto* lastElemPtr = &(m_parentPtr->m_buf[lastIdx]);
+            if (elemPtr == lastElemPtr) {
+                elemPtr = nullptr;  // mark as end()
+                return;
+            }
+
+            auto* frontElemPtr = &(m_parentPtr->m_buf.front());
+            const auto* backElemPtr = &(m_parentPtr->m_buf.back());
+            if (elemPtr == backElemPtr) {
+                elemPtr = frontElemPtr;
+            }
+            else {
+                ++elemPtr;
+            }
+        }
+
+    private:
+        CycleBuffer<T>* const m_parentPtr = nullptr;
+        T* m_elemPtr = nullptr;
     };
 
     explicit CycleBuffer(int size)
@@ -61,8 +87,8 @@ public:
     size_t size() const { return m_size; }
     bool empty() const { return m_size == 0; }
 
-    Iterator begin() noexcept { return Iterator(this, m_headIndex); }
-    Iterator end() noexcept { return Iterator(this, m_headIndex + m_size % m_buf.size()); }
+    Iterator begin() noexcept { return m_size > 0 ? Iterator(this, &m_buf[m_headIndex]) : end(); }
+    Iterator end() noexcept { return Iterator(this, nullptr); }
 
 private:
     friend Iterator;
