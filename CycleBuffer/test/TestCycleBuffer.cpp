@@ -1,5 +1,8 @@
 #include <CycleBuffer.hpp>
 
+#include <cstddef>
+#include <iterator>
+
 #include <gtest/gtest.h>
 // #include <gmock/gmock.h>
 
@@ -156,4 +159,72 @@ TEST(TestCycleBuffer, ShouldPushBackAndPushFront)
     ASSERT_EQ(5, sut.size());
     const std::vector expectedContent3{777, -10, -2, 2, 10};
     ASSERT_EQ(expectedContent3, CycleBufferContent(sut));
+}
+
+TEST(TestCycleBuffer, ShouldChangeFrontElementViaBeginIterator)
+{
+    CycleBuffer<int> sut(5);
+    sut.push_back(11);
+    ASSERT_EQ(11, sut.front());
+    ASSERT_EQ(11, sut.back());
+
+    auto it = sut.begin();
+    *it = -100;
+    ASSERT_EQ(-100, sut.front());
+    ASSERT_EQ(-100, sut.back());
+    ASSERT_EQ(1, sut.size());
+    const std::vector expectedContent{-100};
+    ASSERT_EQ(expectedContent, CycleBufferContent(sut));
+}
+
+TEST(TestCycleBuffer, CheckIfItreatorTypeBidirectional)
+{
+    // static_assert(std::input_iterator<CycleBuffer<int>::Iterator>);
+}
+
+TEST(TestCycleBuffer, ShouldReturnReversedBegin)
+{
+    CycleBuffer<int> sut(5);
+
+    sut.push_front(-1);
+    ASSERT_EQ(-1, *sut.rbegin());
+
+    sut.push_back(10);
+    ASSERT_EQ(10, *sut.rbegin());
+        
+    sut.push_back(-2);
+    ASSERT_EQ(-2, *sut.rbegin());
+
+    //      t     h
+    // 10, -2, _, 4, -1 
+    sut.push_front(4);
+    ASSERT_EQ(-2, *sut.rbegin());
+
+    // //  t  h
+    // // 10, 7, 3, 4, -1 
+    sut.push_front(3);
+    sut.push_front(7);
+    ASSERT_EQ(10, *sut.rbegin());
+
+    sut.push_back(99);
+    ASSERT_EQ(99, *sut.rbegin());
+}
+
+TEST(TestCycleBuffer, ShouldIterateContainerInReverseOrder)
+{
+    CycleBuffer<int> sut(5);
+    ASSERT_EQ(sut.rend(), sut.rbegin());
+
+    for (int i = 1; i <= 5; ++i) {
+        sut.push_back(i * 10);
+    }
+
+    std::vector<int> reversedContent;
+    reversedContent.reserve(sut.size());
+    for (auto it = sut.rbegin(); it != sut.rend(); ++it) {
+        reversedContent.push_back(*it);
+    }
+
+    const std::vector<int> expectedReversedContent{50, 40, 30, 20, 10};
+    ASSERT_EQ(expectedReversedContent, reversedContent);
 }

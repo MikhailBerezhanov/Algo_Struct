@@ -11,13 +11,16 @@ template <typename T>
 class CycleBuffer
 {
 public:
-    class Iterator : public std::iterator<std::forward_iterator_tag, T>
+    class Iterator : public std::iterator<std::bidirectional_iterator_tag, T>
     {
     public:
         Iterator(CycleBuffer<T>* parentPtr, T* elemPtr)
             : m_parentPtr(parentPtr)
             , m_elemPtr(elemPtr) 
         {}
+
+        T* operator-> () { return m_elemPtr; }
+        T& operator* () { return *m_elemPtr; }
 
         Iterator& operator++ ()     // prefix increment: ++it;
         {
@@ -27,13 +30,23 @@ public:
 
         Iterator operator++ (int)   // postfix increment: it++;
         {
-            Iterator tmp = *this;
+            Iterator ret = *this;
             ++(*this);
-            return tmp;
+            return ret;
         }
 
-        T* operator-> () { return m_elemPtr; }
-        T& operator* () { return *m_elemPtr; }
+        Iterator& operator-- ()     // prefix decrement: --it;
+        {
+            decrement(m_elemPtr);
+            return *this;
+        }
+
+        Iterator operator-- (int)   // postfix decrement: it--;
+        {
+            Iterator ret = *this;
+            --(*this);
+            return ret;
+        }
 
         operator bool() const { return m_elemPtr != nullptr; }
         friend bool operator== (const Iterator& lhs, const Iterator& rhs) { return lhs.m_parentPtr == rhs.m_parentPtr && lhs.m_elemPtr == rhs.m_elemPtr; }
@@ -63,10 +76,31 @@ public:
             }
         }
 
+        void decrement(T*& elemPtr)
+        {
+            if (!elemPtr) {
+                const int lastIdx = (m_parentPtr->m_headIndex + m_parentPtr->m_size - 1) % m_parentPtr->m_buf.size();
+                elemPtr = &(m_parentPtr->m_buf[lastIdx]);
+                return;
+            }
+
+            const auto* frontElemPtr = &(m_parentPtr->m_buf.front());
+            auto* backElemPtr = &(m_parentPtr->m_buf.back());
+            if (elemPtr == frontElemPtr) {
+                elemPtr = backElemPtr;
+            }
+            else {
+                --elemPtr;
+            }
+        }
+
     private:
         CycleBuffer<T>* const m_parentPtr = nullptr;
         T* m_elemPtr = nullptr;
     };
+
+    using iterator = Iterator;
+    using reverse_iterator = std::reverse_iterator<iterator>;
 
     explicit CycleBuffer(int size)
     {
@@ -87,8 +121,20 @@ public:
     size_t size() const { return m_size; }
     bool empty() const { return m_size == 0; }
 
-    Iterator begin() noexcept { return m_size > 0 ? Iterator(this, &m_buf[m_headIndex]) : end(); }
-    Iterator end() noexcept { return Iterator(this, nullptr); }
+    iterator begin() noexcept { return m_size > 0 ? Iterator(this, &m_buf[m_headIndex]) : end(); }
+    iterator end() noexcept { return Iterator(this, nullptr); }
+
+    // std::reverse_iterator<> adapter adds decrement before dereferencing:
+    // operator*() const
+    // {
+    //     _Iterator __tmp = current;
+    //     return *--__tmp;
+    // }
+    //
+    // So we can safely return end() as rbegin(), as it will be decremented before dereferencing
+    // , rend() is not guaranteed to be dereferenceable.
+    reverse_iterator rbegin() noexcept { return reverse_iterator(end()); }
+    reverse_iterator rend() noexcept { return reverse_iterator(begin()); }
 
 private:
     friend Iterator;
@@ -150,13 +196,6 @@ T CycleBuffer<T>::front() const
 
     return m_buf[m_headIndex];
 }
-
-
-// GetRange
-// {
-    // i = h
-    // m_size time(s) return m_buf[i++]
-// }
 
 } // namespace Also_Struct
 
