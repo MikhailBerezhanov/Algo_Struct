@@ -14,12 +14,16 @@ public:
     class Iterator : public std::iterator<std::bidirectional_iterator_tag, T>
     {
     public:
-        Iterator(CycleBuffer<T>* parentPtr, T* elemPtr)
-            : m_parentPtr(parentPtr)
+        Iterator(CycleBuffer<T>* container, T* elemPtr)
+            : m_container(container)
             , m_elemPtr(elemPtr) 
         {}
 
-        T* operator-> () { return m_elemPtr; }
+        // Operations needed for any iterator category
+        Iterator() = default;
+        Iterator(const Iterator& other) = default;
+        Iterator& operator= (const Iterator& other) = default;
+        ~Iterator() = default;
         T& operator* () { return *m_elemPtr; }
 
         Iterator& operator++ ()     // prefix increment: ++it;
@@ -35,6 +39,15 @@ public:
             return ret;
         }
 
+        // Operations needed for InputIterator
+        T* operator-> () { return m_elemPtr; }
+        friend bool operator== (const Iterator& lhs, const Iterator& rhs) 
+        { 
+            return lhs.m_container == rhs.m_container && lhs.m_elemPtr == rhs.m_elemPtr; 
+        }
+        friend bool operator!= (const Iterator& lhs, const Iterator& rhs) { return !(lhs == rhs); }
+
+        // Operations needed for BidirectionalIterator
         Iterator& operator-- ()     // prefix decrement: --it;
         {
             decrement(m_elemPtr);
@@ -48,10 +61,6 @@ public:
             return ret;
         }
 
-        operator bool() const { return m_elemPtr != nullptr; }
-        friend bool operator== (const Iterator& lhs, const Iterator& rhs) { return lhs.m_parentPtr == rhs.m_parentPtr && lhs.m_elemPtr == rhs.m_elemPtr; }
-        friend bool operator!= (const Iterator& lhs, const Iterator& rhs) { return !(lhs == rhs); }
-
     private:
         void increment(T*& elemPtr)
         {
@@ -59,15 +68,15 @@ public:
                 return;
             }
 
-            const int lastIdx = (m_parentPtr->m_headIndex + m_parentPtr->m_size - 1) % m_parentPtr->m_buf.size();
-            const auto* lastElemPtr = &(m_parentPtr->m_buf[lastIdx]);
+            const int lastIdx = (m_container->m_headIndex + m_container->m_size - 1) % m_container->m_buf.size();
+            const auto* lastElemPtr = &(m_container->m_buf[lastIdx]);
             if (elemPtr == lastElemPtr) {
                 elemPtr = nullptr;  // mark as end()
                 return;
             }
 
-            auto* frontElemPtr = &(m_parentPtr->m_buf.front());
-            const auto* backElemPtr = &(m_parentPtr->m_buf.back());
+            auto* frontElemPtr = &(m_container->m_buf.front());
+            const auto* backElemPtr = &(m_container->m_buf.back());
             if (elemPtr == backElemPtr) {
                 elemPtr = frontElemPtr;
             }
@@ -79,13 +88,13 @@ public:
         void decrement(T*& elemPtr)
         {
             if (!elemPtr) {
-                const int lastIdx = (m_parentPtr->m_headIndex + m_parentPtr->m_size - 1) % m_parentPtr->m_buf.size();
-                elemPtr = &(m_parentPtr->m_buf[lastIdx]);
+                const int lastIdx = (m_container->m_headIndex + m_container->m_size - 1) % m_container->m_buf.size();
+                elemPtr = &(m_container->m_buf[lastIdx]);
                 return;
             }
 
-            const auto* frontElemPtr = &(m_parentPtr->m_buf.front());
-            auto* backElemPtr = &(m_parentPtr->m_buf.back());
+            const auto* frontElemPtr = &(m_container->m_buf.front());
+            auto* backElemPtr = &(m_container->m_buf.back());
             if (elemPtr == frontElemPtr) {
                 elemPtr = backElemPtr;
             }
@@ -95,7 +104,7 @@ public:
         }
 
     private:
-        CycleBuffer<T>* const m_parentPtr = nullptr;
+        CycleBuffer<T>* m_container = nullptr;
         T* m_elemPtr = nullptr;
     };
 
