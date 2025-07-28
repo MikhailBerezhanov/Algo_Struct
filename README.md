@@ -1,19 +1,26 @@
-# Most common data structers and algorithms impelemtation in C++
+# Most common data structers and algorithms implementated in C++
 
 ## Data structures
 
 ### Currently implemented:
 
-|          Name          |          Description          |          Time Complexity          |          Space Complexity          |
-| ---------------------- | ----------------------------- | --------------------------------- | ---------------------------------- |
-|  Forward Linked List   |                               |                                   |                                    |
-|      Ring Buffer       |                               |                                   |                                    |
-
-
-
-### In Progress:
-1. Cycle Buffer
-
+|          Name          |          Description          |     Operation Time Complexity     |
+| ---------------------- | ----------------------------- | --------------------------------- |
+| `Forward Linked List`  |                               |                                   |
+| ====================== | ============================= | ================================= |
+|                        | Cyclic buffer with fixed      |                                   |
+|                        | capacity, that displaces old  |                                   |
+|    `Ring Buffer`       | elements if size reaches      |      push_back(): O(1)            |
+|                        | capacity. Supports insertion  |                                   |
+|                        | to the back.                  |                                   |
+| ====================== | ============================= | ================================= |                              
+|                        | Cyclic buffer with fixed      |                                   |
+|                        | capacity, that displaces old  |                                   |
+|    `Cycle Buffer`      | elements if size reaches      |      push_back(): O(1)            |
+|                        | capacity. Supports insertions |      push_front(): O(1)           |
+|                        | to the back and front.        |                                   |
+|                        | TODO: random access support   |                                   |
+| ====================== | ============================= | ================================= |                                                                                             
 
 ### TODO:
 
@@ -23,6 +30,7 @@
 4. Doubly Linked List
 5. Hash table
 6. LRU Cache
+7. Deque
 
 7. Binary Search Tree (BST)
 8. Graphs

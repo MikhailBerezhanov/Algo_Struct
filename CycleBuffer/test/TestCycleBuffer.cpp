@@ -4,7 +4,6 @@
 #include <iterator>
 
 #include <gtest/gtest.h>
-// #include <gmock/gmock.h>
 
 using namespace ::testing;
 using namespace AlgoStruct;
@@ -20,11 +19,6 @@ static std::vector<int> CycleBufferContent(CycleBuffer<int>& sut)
 
     return res;
 }
-
-// TEST(TestCycleBuffer, ShouldThrowAtZeroCapacity)
-// {
-//     CycleBuffer<int> sut(0);
-// }
 
 TEST(TestCycleBuffer, ShouldReturnBeginAndEndAtEmptyContainer)
 {
@@ -101,6 +95,19 @@ TEST(TestCycleBuffer, ShouldPushBack)
     ASSERT_EQ(expectedContent4, CycleBufferContent(sut));
 }
 
+TEST(TestCycleBuffer, ShouldPushBackAlotElements)
+{
+    CycleBuffer<int> sut(10);
+
+    for (int i = 1; i <= 10'000; ++i) {
+        sut.push_back(i);
+    }
+
+    ASSERT_EQ(10, sut.size());
+    const std::vector expectedContent{9991, 9992, 9993, 9994, 9995, 9996 , 9997, 9998, 9999, 10'000};
+    ASSERT_EQ(expectedContent, CycleBufferContent(sut));
+}
+
 TEST(TestCycleBuffer, ShouldPushFront)
 {
     CycleBuffer<int> sut(5);
@@ -132,6 +139,19 @@ TEST(TestCycleBuffer, ShouldPushFront)
     sut.push_front(0);
     const std::vector expectedContent4{0, 1, 2, 3, 20};
     ASSERT_EQ(expectedContent4, CycleBufferContent(sut));
+}
+
+TEST(TestCycleBuffer, ShouldPushFrontAlotElements)
+{
+    CycleBuffer<int> sut(7);
+
+    for (int i = 1; i <= 10'000; ++i) {
+        sut.push_back(-i);
+    }
+
+    ASSERT_EQ(7, sut.size());
+    const std::vector expectedContent{-9994, -9995, -9996 , -9997, -9998, -9999, -10'000};
+    ASSERT_EQ(expectedContent, CycleBufferContent(sut));
 }
 
 TEST(TestCycleBuffer, ShouldPushBackAndPushFront)
@@ -175,11 +195,6 @@ TEST(TestCycleBuffer, ShouldChangeFrontElementViaBeginIterator)
     ASSERT_EQ(1, sut.size());
     const std::vector expectedContent{-100};
     ASSERT_EQ(expectedContent, CycleBufferContent(sut));
-}
-
-TEST(TestCycleBuffer, CheckIfItreatorTypeBidirectional)
-{
-    // static_assert(std::input_iterator<CycleBuffer<int>::Iterator>);
 }
 
 TEST(TestCycleBuffer, ShouldReturnReversedBegin)

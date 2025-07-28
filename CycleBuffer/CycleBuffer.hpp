@@ -111,13 +111,13 @@ public:
     using iterator = Iterator;
     using reverse_iterator = std::reverse_iterator<iterator>;
 
-    explicit CycleBuffer(int size)
+    explicit CycleBuffer(int capacity)
     {
-        if (size <= 0) {
-            throw std::invalid_argument("expected size > 0");
+        if (capacity <= 0) {
+            throw std::invalid_argument("expected capacity > 0");
         }
 
-        m_buf.resize(size);
+        m_buf.resize(capacity);
         m_buf.shrink_to_fit();
     }
 
