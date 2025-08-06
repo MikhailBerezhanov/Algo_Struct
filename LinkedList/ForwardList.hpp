@@ -21,8 +21,6 @@ namespace AlgoStruct
     public:
         class Iterator
         {
-            friend Iterator ForwardList<T>::erase_after(Iterator& it);
-            
         public:
             using iterator_category = std::forward_iterator_tag;
             using difference_type = std::ptrdiff_t;
@@ -31,27 +29,20 @@ namespace AlgoStruct
             using reference = T&;
 
             Iterator() = default;
-            explicit Iterator(Node* node): m_current(node) {}
+            explicit Iterator(Node* node): m_node(node) {}
 
             Iterator& operator= (const Iterator& rhs)
             {
-                m_current = rhs.m_current;
+                m_node = rhs.m_node;
                 return *this;
             }
 
-            Node* operator-> ()
-            {
-                return m_current;
-            }
-
-            value_type& operator* ()
-            {
-                return m_current->value;
-            }
+            reference operator* () const { return m_node->value; }
+            pointer operator-> () const { return m_node->value; }
 
             Iterator& operator++ ()
             {
-                m_current = m_current->next;
+                m_node = m_node->next;
                 return *this;
             }
 
@@ -64,7 +55,7 @@ namespace AlgoStruct
 
             friend bool operator== (const Iterator& lhs, const Iterator& rhs) noexcept
             {
-                return lhs.m_current == rhs.m_current;
+                return lhs.m_node == rhs.m_node;
             }
 
             friend bool operator!= (const Iterator& lhs, const Iterator& rhs) noexcept
@@ -74,21 +65,22 @@ namespace AlgoStruct
 
             operator bool () const
             {
-                return m_current != nullptr;
+                return m_node != nullptr;
             }
 
             Iterator& operator+= (difference_type n)
             {
                 while (n--)
                 {
-                    m_current = m_current->next;
+                    m_node = m_node->next;
                 }
 
                 return *this;
             }
 
         private:
-            Node* m_current = nullptr;
+            friend ForwardList<T>;
+            Node* m_node = nullptr;
         };
 
         ForwardList() = default;
@@ -250,8 +242,8 @@ namespace AlgoStruct
             return;
         }
 
-        Node *new_node = new Node{value, it->next};
-        it->next = new_node;
+        Node *new_node = new Node{value, it.m_node->next};
+        it.m_node->next = new_node;
 
         if (it == Iterator(m_tail))
         {
@@ -264,22 +256,22 @@ namespace AlgoStruct
     template <typename T>
     auto ForwardList<T>::erase_after(Iterator& it) -> Iterator
     {
-        if (!it || !it->next)
+        if (!it || !it.m_node->next)
         {
             return end();
         }
 
-        Node* to_delete = it->next;
-        it->next = it->next->next;
+        Node* to_delete = it.m_node->next;
+        it.m_node->next = it.m_node->next->next;
         delete(to_delete);
 
         if (to_delete == m_tail)
         {
-            m_tail = it.m_current;
+            m_tail = it.m_node;
         }
 
         --m_size;
-        return Iterator{it->next};
+        return Iterator{it.m_node->next};
     }
 
     template <typename T>
