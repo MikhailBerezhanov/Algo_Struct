@@ -11,9 +11,15 @@ template <typename T>
 class CycleBuffer
 {
 public:
-    class Iterator : public std::iterator<std::bidirectional_iterator_tag, T>
+    class Iterator
     {
     public:
+        using iterator_category = std::bidirectional_iterator_tag;
+        using value_type = T;
+        using pointer = T*;
+        using reference = T&;
+        using difference_type = std::ptrdiff_t;
+
         Iterator(CycleBuffer<T>* container, T* elemPtr)
             : m_container(container)
             , m_elemPtr(elemPtr) 
