@@ -85,8 +85,8 @@ public:
     // Iterators
     iterator begin() const noexcept { return empty() ? end() : iterator(m_beforeHead->next); }
     iterator end() const noexcept { return iterator(m_beforeHead); }
-    iterator rbegin() const noexcept { return end(); }
-    iterator rend() const noexcept { return begin(); }
+    reverse_terator rbegin() const noexcept { return reverse_terator(end()); }
+    reverse_terator rend() const noexcept { return reverse_terator(begin()); }
 
     // Capacity
     size_t size() const { return m_size; }
@@ -98,9 +98,9 @@ public:
     void erase(iterator pos);                       // Removes the element at pos
 
     void push_back(const T& val) { insert(end(), val); }
-    void pop_back();
+    void pop_back() { erase(iterator(m_beforeHead->prev)); }
     void push_front(const T& val) { insert(begin(), val); }
-    void pop_front();
+    void pop_front() { erase(begin()); }
 
     // swap()
     void reverse();
@@ -137,6 +137,7 @@ template <typename T>
 DoublyLinkedList<T>::~DoublyLinkedList()
 {
     clear();
+    delete(m_beforeHead);
 }
 
 template <typename T>
@@ -180,7 +181,7 @@ auto DoublyLinkedList<T>::insert(iterator pos, const T& value) -> iterator
 
     if (pos == end())
     {
-        // Insertion at the tail
+        // Insertion to the tail
         if (m_beforeHead->prev)
         {
             m_beforeHead->prev->next = newNode;
@@ -201,7 +202,15 @@ auto DoublyLinkedList<T>::insert(iterator pos, const T& value) -> iterator
         // Insertion before head
         newNode->next = m_beforeHead->next;
         newNode->prev = m_beforeHead;
-        if (m_beforeHead->next) m_beforeHead->next->prev = newNode;
+
+        if (m_beforeHead->next)
+        {
+            m_beforeHead->next->prev = newNode;
+        }
+        else
+        {
+            m_beforeHead->prev = newNode;
+        }
         m_beforeHead->next = newNode;
     }
     else
@@ -220,7 +229,30 @@ auto DoublyLinkedList<T>::insert(iterator pos, const T& value) -> iterator
 template <typename T>
 void DoublyLinkedList<T>::erase(iterator pos)
 {
-// TODO:
+    if (empty()) throw std::invalid_argument("erase() on empty DoublyLinkedList");
+    
+    ListNode* nodeToDelete = nullptr;
+    if (pos == this->begin())
+    {
+        nodeToDelete = m_beforeHead->next;
+        m_beforeHead->next = m_beforeHead->next->next;
+        m_beforeHead->next->prev = m_beforeHead;
+    }
+    else if (pos == iterator(m_beforeHead->prev))
+    {
+        nodeToDelete = m_beforeHead->prev;
+        m_beforeHead->prev = m_beforeHead->prev->prev;
+        m_beforeHead->prev->next = m_beforeHead;
+    }
+    else
+    {
+        nodeToDelete = pos.m_node;
+        pos.m_node->prev->next = pos.m_node->next;
+        pos.m_node->next->prev = pos.m_node->prev;
+    }
+
+    delete(nodeToDelete);
+    --m_size;
 }
 
 // External operations
