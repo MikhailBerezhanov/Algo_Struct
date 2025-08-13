@@ -102,7 +102,7 @@ public:
     void push_front(const T& val) { insert(begin(), val); }
     void pop_front() { erase(begin()); }
 
-    // swap()
+    void swap(DoublyLinkedList& other) noexcept;
     void reverse();
     // merge()
     // sort()
@@ -115,8 +115,8 @@ private:
     
                     [head]               [tail]
                        v                   v
-       beforeHead -> node1 <-> node2 <-> node3
-             ^____________________________/
+       beforeHead <-> node1 <-> node2 <-> node3
+           ^________________________________^
 
     */
     ListNode* m_beforeHead = nullptr;
@@ -253,6 +253,32 @@ void DoublyLinkedList<T>::erase(iterator pos)
 
     delete(nodeToDelete);
     --m_size;
+}
+
+template <typename T>
+void DoublyLinkedList<T>::reverse()
+{
+    ListNode* currNode = m_beforeHead->next;
+    ListNode* tmp = nullptr;
+
+    while (currNode && currNode != m_beforeHead)
+    {
+        tmp = currNode->next;
+        currNode->next = currNode->prev;
+        currNode->prev = tmp;
+        currNode = tmp;
+    }
+
+    tmp = m_beforeHead->next;
+    m_beforeHead->next = m_beforeHead->prev;
+    m_beforeHead->prev = tmp;
+}
+
+template <typename T>
+void DoublyLinkedList<T>::swap(DoublyLinkedList<T>& other) noexcept
+{
+    std::swap(m_beforeHead, other.m_beforeHead);
+    std::swap(m_size, other.m_size);
 }
 
 // External operations

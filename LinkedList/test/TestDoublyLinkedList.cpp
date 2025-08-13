@@ -331,7 +331,6 @@ TEST(TestDoublyLinkedList, ShouldEraseElementFromBegin)
     ASSERT_TRUE(sut.empty());
 }
 
-
 TEST(TestDoublyLinkedList, ShouldEraseElementFromEnd)
 {
     DoublyLinkedList sut{1000, -100, 7123400};
@@ -397,32 +396,217 @@ TEST(TestDoublyLinkedList, ShouldPushFrontAfterErase)
     }
 }
 
+TEST(TestDoublyLinkedList, ShouldThrowOnPopBackAtEmptyList)
+{
+    DoublyLinkedList<char> sut;
+    ASSERT_ANY_THROW(sut.pop_back());
+}
+
 TEST(TestDoublyLinkedList, ShouldPopBackOneElement)
 {
-    
+    DoublyLinkedList sut{-1, 0};
+    ASSERT_EQ(0, sut.back());
+
+    sut.pop_back();
+    ASSERT_EQ(-1, sut.back());
+    const DoublyLinkedList expected{-1};
+    ASSERT_EQ(expected, sut) << "Expected: " << ToString(expected) << ", got: " << ToString(sut);
 }
 
 TEST(TestDoublyLinkedList, ShouldPopBackSeveralElements)
 {
-    
+    DoublyLinkedList sut{-1, 0, 1, 2, 3};
+
+    sut.pop_back();
+    sut.pop_back();
+    ASSERT_EQ(-1, sut.front());
+    ASSERT_EQ(1, sut.back());
+    const DoublyLinkedList expected{-1, 0, 1};
+    ASSERT_EQ(expected, sut) << "Expected: " << ToString(expected) << ", got: " << ToString(sut);
+}
+
+TEST(TestDoublyLinkedList, ShouldPopBackAllElements)
+{
+    DoublyLinkedList sut{-1, 0, 1, 2, 3};
+
+    while (!sut.empty())
+    {
+        sut.pop_back();
+    }
+    ASSERT_EQ(0, sut.size());
+}
+
+TEST(TestDoublyLinkedList, ShouldThrowOnPopFrontAtEmptyList)
+{
+    DoublyLinkedList<char> sut;
+    ASSERT_ANY_THROW(sut.pop_front());
 }
 
 TEST(TestDoublyLinkedList, ShouldPopFrontkOneElement)
 {
-    
+    DoublyLinkedList sut{'b', 'e', 'G', 'G', 's'};
+
+    sut.pop_front();
+    ASSERT_EQ('e', sut.front());
+    const DoublyLinkedList expected{'e', 'G', 'G', 's'};
+    ASSERT_EQ(expected, sut) << "Expected: " << ToString(expected) << ", got: " << ToString(sut);
 }
 
 TEST(TestDoublyLinkedList, ShouldPopFrontSeveralElements)
 {
-    
+    DoublyLinkedList sut{'b', 'e', 'G', 'G', 's'};
+
+    sut.pop_front();
+    sut.pop_front();
+    sut.pop_front();
+    sut.pop_front();
+    ASSERT_EQ('s', sut.front());
+    const DoublyLinkedList expected{'s'};
+    ASSERT_EQ(expected, sut) << "Expected: " << ToString(expected) << ", got: " << ToString(sut);
+}
+
+TEST(TestDoublyLinkedList, ShouldPopFrontAllElements)
+{
+    DoublyLinkedList sut{-1, 0, 1, 2, 3};
+
+    while (!sut.empty())
+    {
+        sut.pop_front();
+    }
+    ASSERT_EQ(0, sut.size());
 }
 
 TEST(TestDoublyLinkedList, ShouldPushBackAfterPopFront)
 {
-    
+    {
+        DoublyLinkedList sut{'p'};
+
+        sut.pop_front();
+        sut.push_back('q');
+        sut.push_back('a');
+        const DoublyLinkedList expected{'q', 'a'};
+        ASSERT_EQ(expected, sut) << "Expected: " << ToString(expected) << ", got: " << ToString(sut);
+    }
+    {
+        DoublyLinkedList sut{'K', 'i', 'n', 'G', '&', 'Q', 'u', 'e', 'e', 'n'};
+
+        sut.pop_front();
+        sut.push_back('8');
+        const DoublyLinkedList expected{'i', 'n', 'G', '&', 'Q', 'u', 'e', 'e', 'n', '8'};
+        ASSERT_EQ(expected, sut) << "Expected: " << ToString(expected) << ", got: " << ToString(sut);
+    }
 }
 
 TEST(TestDoublyLinkedList, ShouldPushFrontAfterPopBack)
 {
-    
+    {
+        DoublyLinkedList sut{'p'};
+
+        sut.pop_back();
+        sut.push_front('l');
+        sut.push_front('w');
+        sut.push_front('o');
+        const DoublyLinkedList expected{'o', 'w', 'l'};
+        ASSERT_EQ(expected, sut) << "Expected: " << ToString(expected) << ", got: " << ToString(sut);
+    }
+    {
+        DoublyLinkedList sut{1, 2, 4};
+
+        sut.pop_back();
+        sut.push_front(-2);
+        sut.push_front(0);
+        const DoublyLinkedList expected{0, -2, 1, 2};
+        ASSERT_EQ(expected, sut) << "Expected: " << ToString(expected) << ", got: " << ToString(sut);
+    }
+}
+
+TEST(TestDoublyLinkedList, ShouldReverseEmptyList)
+{
+    DoublyLinkedList<int> sut;
+
+    sut.reverse();
+    ASSERT_TRUE(sut.empty());
+    ASSERT_EQ(sut.begin(), sut.end());
+    ASSERT_EQ(sut.rbegin(), sut.rend());
+}
+
+TEST(TestDoublyLinkedList, ShouldReverseListWithOneElement)
+{
+    DoublyLinkedList sut{1};
+
+    sut.reverse();
+    ASSERT_EQ(1, sut.size());
+    ASSERT_EQ(1, sut.front());
+    ASSERT_EQ(1, sut.back());
+}
+
+TEST(TestDoublyLinkedList, ShouldReverseListWithManyElements)
+{
+    DoublyLinkedList sut{3, 2, 1, 0, -1};
+
+    sut.reverse();
+    const DoublyLinkedList expected{-1, 0, 1, 2, 3};
+    ASSERT_EQ(expected, sut) << "Expected: " << ToString(expected) << ", got: " << ToString(sut);
+
+    const int expectedReversed[] = {3, 2, 1, 0, -1};
+    auto idx = 0;
+    for (auto it = sut.rbegin(); it != sut.rend(); ++it)
+    {
+        ASSERT_EQ(expectedReversed[idx], *it);
+        ++idx;
+    }
+}
+
+TEST(TestDoublyLinkedList, ShouldSwapListWithEmptyList)
+{
+    DoublyLinkedList<int> sut1{10, -9, 1, 0, 0};
+    DoublyLinkedList<int> sut2;
+
+    sut1.swap(sut2);
+    ASSERT_TRUE(sut1.empty());
+    const DoublyLinkedList expected2{10, -9, 1, 0, 0};
+    ASSERT_EQ(expected2, sut2) << "Expected: " << ToString(expected2) << ", got: " << ToString(sut2);
+}
+
+TEST(TestDoublyLinkedList, ShouldSwapEmptyLists)
+{
+    DoublyLinkedList<int> sut1;
+    DoublyLinkedList<int> sut2;
+
+    sut1.swap(sut2);
+    ASSERT_TRUE(sut1.empty());
+    ASSERT_TRUE(sut2.empty());
+}
+
+TEST(TestDoublyLinkedList, ShouldSwapNonEmptyListsWithDifferentSizes)
+{
+    DoublyLinkedList<int> sut1{1, 2, 3, 4, 5, 6};
+    DoublyLinkedList<int> sut2{-10, -209};
+
+    sut1.swap(sut2);
+    const DoublyLinkedList expected1{-10, -209};
+    ASSERT_EQ(expected1, sut1) << "Expected: " << ToString(expected1) << ", got: " << ToString(sut1);
+    const DoublyLinkedList expected2{1, 2, 3, 4, 5, 6};
+    ASSERT_EQ(expected2, sut2) << "Expected: " << ToString(expected2) << ", got: " << ToString(sut2);
+}
+
+TEST(TestDoublyLinkedList, ShouldRetainOriginalContentAfterSwapListsTwoTimes)
+{
+    DoublyLinkedList<int> sut1{1, 2, 3, 4, 5};
+    DoublyLinkedList<int> sut2{-10, -20, -100};
+
+    {
+        sut1.swap(sut2);
+        const DoublyLinkedList expected1{-10, -20, -100};
+        ASSERT_EQ(expected1, sut1) << "Expected: " << ToString(expected1) << ", got: " << ToString(sut1);
+        const DoublyLinkedList expected2{1, 2, 3, 4, 5};
+        ASSERT_EQ(expected2, sut2) << "Expected: " << ToString(expected2) << ", got: " << ToString(sut2);
+    }
+    {
+        sut2.swap(sut1);
+        const DoublyLinkedList expected1{1, 2, 3, 4, 5};
+        ASSERT_EQ(expected1, sut1) << "Expected: " << ToString(expected1) << ", got: " << ToString(sut1);
+        const DoublyLinkedList expected2{-10, -20, -100};
+        ASSERT_EQ(expected2, sut2) << "Expected: " << ToString(expected2) << ", got: " << ToString(sut2);
+    }
 }
