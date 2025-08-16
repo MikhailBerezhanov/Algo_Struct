@@ -9,7 +9,6 @@ add_executable(cycle_buffer_test
 
 target_link_libraries(cycle_buffer_test
     GTest::gtest_main
-    GTest::gmock_main
 )
 
 include(GoogleTest)

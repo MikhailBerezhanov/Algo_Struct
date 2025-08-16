@@ -6,7 +6,17 @@
 
 |          Name          |          Description          |     Operation Time Complexity     |
 | ---------------------- | ----------------------------- | --------------------------------- |
-| `Forward Linked List`  |                               |                                   |
+|                        |                               |      push_back(): O(1)            |
+|                        |                               |      push_front(): O(1)           |
+|  `Forward Linked List` | Unidirectional linked list    |      insert_after(): O(1)         |
+|                        |                               |      erase_after(): O(1)          |
+|                        |                               |      sort(): O(n log n)           |
+| ====================== | ============================= | ================================= |
+|                        |                               |      push_back(): O(1)            |
+|                        |                               |      push_front(): O(1)           |
+|  `Doubly Linked List`  | Bidirectional linked list     |      insert(): O(1)               |
+|                        |                               |      erase(): O(1)                |
+|                        |                               |                                   |
 | ====================== | ============================= | ================================= |
 |                        | Cyclic buffer with fixed      |                                   |
 |                        | capacity, that displaces old  |                                   |
