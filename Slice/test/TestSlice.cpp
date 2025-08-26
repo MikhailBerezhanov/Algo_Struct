@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include <vector>
+#include <vector> // TO REMOVE
 
 using namespace ::testing;
 using namespace AlgoStruct;
@@ -38,4 +38,22 @@ TEST(TestlSice, ShouldPushBackToNonEmptySliceAfterConstruction)
 
     sut.push_back(133);
     ASSERT_EQ(133, sut.back());
+}
+
+TEST(TestlSice, ShouldPopBack)
+{
+    Slice sut{1, 2, 3};
+
+    ASSERT_EQ(3, sut.back());
+
+    sut.pop_back();
+    ASSERT_EQ(2, sut.size());
+    ASSERT_EQ(2, sut.back());
+
+     sut.pop_back();
+    ASSERT_EQ(1, sut.size());
+    ASSERT_EQ(1, sut.back());
+
+    sut.pop_back();
+    ASSERT_TRUE(sut.empty());
 }

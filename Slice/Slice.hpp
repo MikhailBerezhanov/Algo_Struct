@@ -55,11 +55,12 @@ public:
         }
 
         // Random access iterator operations
-        // operator+=
-        // operator-=
+        // reference operator[] (difference_type n) const
+        // Iterator& operator+= (difference_type n)
+        // Iterator& operator-= (difference_type n)
         // operator>
-        // operator<=
         // operator<
+        // operator<=
         // operator>=
 
     private:
@@ -163,7 +164,7 @@ void Slice<T>::resize(size_t size, T initialVal)
     }
     else if (size < m_size)
     {
-        // Erase extra elements
+        // Virtually erase extra elements
         m_size = size;
     }
 }
@@ -187,12 +188,12 @@ void Slice<T>::clear()
 template<typename T>
 void Slice<T>::reallocate_buffer(size_t newCapacity)
 {
-    printf("reallocate_buffer, newCapacity: %ld\n", newCapacity);
+    printf("reallocate_buffer with newCapacity: %ld\n", newCapacity);
     // Reallocate internal buffer
     m_capacity = newCapacity;
     auto newBuf = new T[m_capacity];
 
-    // Copy existing data
+    // Copy existing elements
     std::memmove(newBuf, m_buf, sizeof(T) * m_size);
     std::swap(m_buf, newBuf);
 
@@ -211,6 +212,14 @@ void Slice<T>::push_back(const T& val)
     }
 
     m_buf[m_size++] = val;
+}
+
+template<typename T>
+void Slice<T>::pop_back()
+{
+    if (empty()) return;
+
+    --m_size;
 }
 
 } // anmespace AlgoStruct
