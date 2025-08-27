@@ -23,7 +23,7 @@ public:
         // Base iterator operations
         Iterator() = default;
         Iterator(T* bufPtr): m_bufPtr(bufPtr) {}
-        T& operator* () const { return *m_bufPtr; }
+        reference operator* () const { return *m_bufPtr; }
         Iterator& operator++ ()
         {
             ++m_bufPtr;
@@ -55,13 +55,27 @@ public:
         }
 
         // Random access iterator operations
-        // reference operator[] (difference_type n) const
-        // Iterator& operator+= (difference_type n)
-        // Iterator& operator-= (difference_type n)
-        // operator>
-        // operator<
-        // operator<=
-        // operator>=
+        Iterator& operator+= (difference_type n) 
+        { 
+            m_bufPtr += n;
+            return *this;
+        }
+        friend Iterator operator+ (Iterator it, difference_type n) { return it += n; }
+        friend Iterator operator+ (difference_type n, Iterator it) { return it + n; }
+
+        Iterator& operator-= (difference_type n)
+        {
+            m_bufPtr -= n;
+            return *this;
+        }
+        friend Iterator operator- (Iterator it, difference_type n) { return it -= n; }
+        friend difference_type operator- (const Iterator& lhs, const Iterator& rhs) { return lhs.m_bufPtr - rhs.m_bufPtr; }
+
+        reference operator[] (difference_type n) const { return *(m_bufPtr + n); }
+        friend bool operator< (const Iterator& lhs, const Iterator& rhs) { return lhs.m_bufPtr < rhs.m_bufPtr; }
+        friend bool operator> (const Iterator& lhs, const Iterator& rhs) { return rhs < lhs; }
+        friend bool operator<= (const Iterator& lhs, const Iterator& rhs) { return !(lhs > rhs); }
+        friend bool operator>= (const Iterator& lhs, const Iterator& rhs) { return !(lhs < rhs); }
 
     private:
         T* m_bufPtr = nullptr;
@@ -75,12 +89,12 @@ public:
     Slice(size_t size, T initialVal = T{});
     ~Slice();
 
-    // TODO: deep-copy
+    // TODO: deep-copy semantics
     Slice(const Slice& other);  
     Slice& operator= (const Slice& other);
-    // TODO: move
-    Slice(Slice&& other);
-    Slice& operator= (Slice&& other);
+    // Movement semantics
+    Slice(Slice&& other) noexcept;
+    Slice& operator= (Slice&& other) noexcept;
 
     // Element access
     T& front() const;
@@ -97,13 +111,14 @@ public:
     size_t size() const { return m_size; }
     size_t capacity() const { return m_capacity; }
     bool empty() const { return m_size == 0; }
-    void resize(size_t size , T initialVal = T{});
     void reserve(size_t capacity);
 
     // Modifiers
     void clear();
     void push_back(const T& val);
     void pop_back();
+    void resize(size_t size , T initialVal = T{});
+    void swap(Slice& other) noexcept;
 
 private:
     void reallocate_buffer(size_t newCapacity);
@@ -133,9 +148,38 @@ Slice<T>::Slice(size_t size, T initialVal)
 }
 
 template<typename T>
+Slice<T>::Slice(const Slice& other)
+{
+
+}
+
+template<typename T>
+Slice<T>::Slice(Slice&& other) noexcept
+{
+    Slice tmp;
+    this->swap(other);
+    other.swap(tmp);
+}
+
+template<typename T>
 Slice<T>::~Slice()
 {
     this->clear();
+}
+
+template<typename T>
+Slice<T>& Slice<T>::operator= (const Slice<T>& other)
+{
+    return *this;
+}
+
+template<typename T>
+Slice<T>& Slice<T>::operator= (Slice<T>&& other) noexcept
+{
+    Slice tmp;
+    this->swap(other);
+    other.swap(tmp);
+    return *this;
 }
 
 template<typename T>
@@ -150,23 +194,6 @@ T& Slice<T>::back() const
 {
     if (empty()) throw std::invalid_argument("back() on empty Slice");
     return *(m_buf + m_size - 1);
-}
-
-template<typename T>
-void Slice<T>::resize(size_t size, T initialVal)
-{
-    if (size > m_size)
-    {
-        for (auto i = 0; i < size - m_size; ++i)
-        {
-            this->push_back(initialVal);
-        }
-    }
-    else if (size < m_size)
-    {
-        // Virtually erase extra elements
-        m_size = size;
-    }
 }
 
 template<typename T>
@@ -188,7 +215,6 @@ void Slice<T>::clear()
 template<typename T>
 void Slice<T>::reallocate_buffer(size_t newCapacity)
 {
-    printf("reallocate_buffer with newCapacity: %ld\n", newCapacity);
     // Reallocate internal buffer
     m_capacity = newCapacity;
     auto newBuf = new T[m_capacity];
@@ -220,6 +246,31 @@ void Slice<T>::pop_back()
     if (empty()) return;
 
     --m_size;
+}
+
+template<typename T>
+void Slice<T>::resize(size_t size, T initialVal)
+{
+    if (size > m_size)
+    {
+        for (auto i = 0; i < size - m_size; ++i)
+        {
+            this->push_back(initialVal);
+        }
+    }
+    else if (size < m_size)
+    {
+        // Virtually erase extra elements
+        m_size = size;
+    }
+}
+
+template<typename T>
+void Slice<T>::swap(Slice& other) noexcept
+{
+    std::swap(m_buf, other.m_buf);
+    std::swap(m_size, other.m_size);
+    std::swap(m_capacity, other.m_capacity);
 }
 
 } // anmespace AlgoStruct
