@@ -8,7 +8,7 @@
 namespace AlgoStruct 
 {
 template<typename T>
-class Slice
+class Vector
 {
 public:
     class Iterator
@@ -84,17 +84,17 @@ public:
     using iterator = Iterator;
     using reverse_iterator = std::reverse_iterator<iterator>;
 
-    Slice() = default;
-    explicit Slice(std::initializer_list<T> init);
-    Slice(size_t size, T initialVal = T{});
-    ~Slice();
+    Vector() = default;
+    explicit Vector(std::initializer_list<T> init);
+    Vector(size_t size, T initialVal = T{});
+    ~Vector();
 
     // TODO: deep-copy semantics
-    Slice(const Slice& other);  
-    Slice& operator= (const Slice& other);
+    Vector(const Vector& other);  
+    Vector& operator= (const Vector& other);
     // Movement semantics
-    Slice(Slice&& other) noexcept;
-    Slice& operator= (Slice&& other) noexcept;
+    Vector(Vector&& other) noexcept;
+    Vector& operator= (Vector&& other) noexcept;
 
     // Element access
     T& front() const;
@@ -118,7 +118,7 @@ public:
     void push_back(const T& val);
     void pop_back();
     void resize(size_t size , T initialVal = T{});
-    void swap(Slice& other) noexcept;
+    void swap(Vector& other) noexcept;
 
 private:
     void reallocate_buffer(size_t newCapacity);
@@ -132,7 +132,7 @@ private:
 };
 
 template<typename T>
-Slice<T>::Slice(std::initializer_list<T> init)
+Vector<T>::Vector(std::initializer_list<T> init)
 {
     this->reserve(init.size());
     for (const auto& elem : init)
@@ -142,62 +142,62 @@ Slice<T>::Slice(std::initializer_list<T> init)
 }
 
 template<typename T>
-Slice<T>::Slice(size_t size, T initialVal)
+Vector<T>::Vector(size_t size, T initialVal)
 {
     this->resize(size, initialVal);
 }
 
 template<typename T>
-Slice<T>::Slice(const Slice& other)
+Vector<T>::Vector(const Vector& other)
 {
 
 }
 
 template<typename T>
-Slice<T>::Slice(Slice&& other) noexcept
+Vector<T>::Vector(Vector&& other) noexcept
 {
-    Slice tmp;
+    Vector tmp;
     this->swap(other);
     other.swap(tmp);
 }
 
 template<typename T>
-Slice<T>::~Slice()
+Vector<T>::~Vector()
 {
     this->clear();
 }
 
 template<typename T>
-Slice<T>& Slice<T>::operator= (const Slice<T>& other)
+Vector<T>& Vector<T>::operator= (const Vector<T>& other)
 {
     return *this;
 }
 
 template<typename T>
-Slice<T>& Slice<T>::operator= (Slice<T>&& other) noexcept
+Vector<T>& Vector<T>::operator= (Vector<T>&& other) noexcept
 {
-    Slice tmp;
+    Vector tmp;
     this->swap(other);
     other.swap(tmp);
     return *this;
 }
 
 template<typename T>
-T& Slice<T>::front() const
+T& Vector<T>::front() const
 {
-    if (empty()) throw std::invalid_argument("front() on empty Slice");
+    if (empty()) throw std::invalid_argument("front() on empty Vector");
     return *m_buf;
 }
 
 template<typename T>
-T& Slice<T>::back() const
+T& Vector<T>::back() const
 {
-    if (empty()) throw std::invalid_argument("back() on empty Slice");
+    if (empty()) throw std::invalid_argument("back() on empty Vector");
     return *(m_buf + m_size - 1);
 }
 
 template<typename T>
-void Slice<T>::reserve(size_t capacity)
+void Vector<T>::reserve(size_t capacity)
 {
     if (capacity <= m_capacity) return;
 
@@ -205,7 +205,7 @@ void Slice<T>::reserve(size_t capacity)
 }
 
 template<typename T>
-void Slice<T>::clear()
+void Vector<T>::clear()
 {
     delete[] m_buf;
     m_size = 0;
@@ -213,7 +213,7 @@ void Slice<T>::clear()
 }
 
 template<typename T>
-void Slice<T>::reallocate_buffer(size_t newCapacity)
+void Vector<T>::reallocate_buffer(size_t newCapacity)
 {
     // Reallocate internal buffer
     m_capacity = newCapacity;
@@ -228,7 +228,7 @@ void Slice<T>::reallocate_buffer(size_t newCapacity)
 }
 
 template<typename T>
-void Slice<T>::push_back(const T& val)
+void Vector<T>::push_back(const T& val)
 {
     if (m_size == m_capacity)
     {
@@ -241,7 +241,7 @@ void Slice<T>::push_back(const T& val)
 }
 
 template<typename T>
-void Slice<T>::pop_back()
+void Vector<T>::pop_back()
 {
     if (empty()) return;
 
@@ -249,7 +249,7 @@ void Slice<T>::pop_back()
 }
 
 template<typename T>
-void Slice<T>::resize(size_t size, T initialVal)
+void Vector<T>::resize(size_t size, T initialVal)
 {
     if (size > m_size)
     {
@@ -266,11 +266,11 @@ void Slice<T>::resize(size_t size, T initialVal)
 }
 
 template<typename T>
-void Slice<T>::swap(Slice& other) noexcept
+void Vector<T>::swap(Vector& other) noexcept
 {
     std::swap(m_buf, other.m_buf);
     std::swap(m_size, other.m_size);
     std::swap(m_capacity, other.m_capacity);
 }
 
-} // anmespace AlgoStruct
+} // namespace AlgoStruct

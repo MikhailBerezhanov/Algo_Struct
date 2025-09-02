@@ -7,6 +7,7 @@ RUN apt-get update && \
         build-essential \
         cmake \
         git \
+        valgrind \
         && rm -rf /var/lib/apt/lists/*
 
 # Add vscode user

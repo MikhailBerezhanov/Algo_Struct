@@ -1,4 +1,4 @@
-#include "Slice.hpp"
+#include "Vector.hpp"
 
 #include <gtest/gtest.h>
 
@@ -9,7 +9,7 @@ using namespace AlgoStruct;
 
 TEST(TestlSice, ShouldPushBack)
 {
-    Slice<int> sut;
+    Vector<int> sut;
 
     ASSERT_EQ(0, sut.size());
     ASSERT_TRUE(sut.empty());
@@ -32,9 +32,9 @@ TEST(TestlSice, ShouldPushBack)
     }
 }
 
-TEST(TestlSice, ShouldPushBackToNonEmptySliceAfterConstruction)
+TEST(TestlSice, ShouldPushBackToNonEmptyVectorAfterConstruction)
 {
-    Slice sut{1, 2, 3, 4, 5, 6, 7, 8, 9, 0};
+    Vector sut{1, 2, 3, 4, 5, 6, 7, 8, 9, 0};
 
     sut.push_back(133);
     ASSERT_EQ(133, sut.back());
@@ -42,7 +42,7 @@ TEST(TestlSice, ShouldPushBackToNonEmptySliceAfterConstruction)
 
 TEST(TestlSice, ShouldPopBack)
 {
-    Slice sut{1, 2, 3};
+    Vector sut{1, 2, 3};
 
     ASSERT_EQ(3, sut.back());
 
@@ -58,9 +58,9 @@ TEST(TestlSice, ShouldPopBack)
     ASSERT_TRUE(sut.empty());
 }
 
-TEST(TestSlice, ShouldPerfromIteratorArithmetics)
+TEST(TestVector, ShouldPerfromIteratorArithmetics)
 {
-    Slice sut{1, 2, 3};
+    Vector sut{1, 2, 3};
     ASSERT_LT(sut.begin(), sut.end());
 
     auto it = sut.begin();
@@ -91,8 +91,8 @@ TEST(TestlSice, ShouldCopyAssign)
 
 TEST(TestlSice, ShouldMoveConstruct)
 {
-    Slice sut1{1, 2, 3};
-    Slice sut2(std::move(sut1));
+    Vector sut1{1, 2, 3};
+    Vector sut2(std::move(sut1));
 
     ASSERT_TRUE(sut1.empty());
     ASSERT_EQ(3, sut2.size());
@@ -103,8 +103,8 @@ TEST(TestlSice, ShouldMoveConstruct)
 
 TEST(TestlSice, ShouldMoveAssign)
 {
-    Slice sut1{-10, -20, -30, -40, -50};
-    Slice sut2{1, 2};
+    Vector sut1{-10, -20, -30, -40, -50};
+    Vector sut2{1, 2};
 
     sut2 = std::move(sut1);
     sut2.push_back(100);
